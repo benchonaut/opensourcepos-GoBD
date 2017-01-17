@@ -2,6 +2,7 @@
 #### You need an authenticated firefox profile first, then create an archive like:  tar cvzf mozilla.profile.tar.gz .mozilla/
 #### this script expects an already installed "cmdlnprint" extension in your pre-authed firefox profile
 #### this scripts expects your mozilla.profile.tar.gz in your home directory
+vnc_display_first() { ps -Fc|grep Xtight|grep -v grep |grep X11|sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
 hosturl="http://127.0.0.1"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
@@ -16,7 +17,7 @@ echo "$list"|while read a;do
 	pretarget=$outdir"/.invoices/"$invnum".pdf";
 	test -e $finaltarget || (
 				cd ~;test -d .mozilla/ && rm -rf .mozilla && tar xzf mozilla.profile.tar.gz 
-				firefox -silent -tray \
+				firefox --display $(vnc_display_first) -silent -tray \
 				-print-shrinktofit yes \
 				-print-header-left no -print-header-center no -print-header-right no \
 				-print-footer-center no -print-footer-left no -print-footer-right no \
