@@ -3,9 +3,19 @@
 #### this script expects an already installed "cmdlnprint" extension in your pre-authed firefox profile
 #### this scripts expects your mozilla.profile.tar.gz in your home directory
 vnc_display_first() { ps -Fc|grep Xtight|grep -v grep |grep X11|sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
+
+grep "Path=ospos-headless.ospos-headless" ~/.mozilla/firefox/profiles.ini|| echo -en "\n[Profile"$(cat ~/.mozilla/firefox/profiles.ini |grep "\[Profile"|wc -l)"]\nName=ospos-headless\nIsRelative=1\nPath=ospos-headless.ospos-headless\n" >> ~/.mozilla/firefox/profiles.ini
+mkdir -p /tmp/ospos-headless/cache;mkdir -p /tmp/ospos-headless/profile;
+chown $(id -un) /tmp/ospos-headless;chgrp $(id -gn) /tmp/ospos-headless;
+ln -sf /tmp/ospos-headless/cache ~/.cache/mozilla/firefox/ospos-headless.ospos-headless
+ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/firefox/ospos-headless.ospos-headless
+
+
+firefox -P ospos-headless --display $(vnc_display_first );sleep 10;##find way to wait for port 32000 to open 
 hosturl="http://127.0.0.1"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
+echo 'window.location="'$osposurl'public/login";widow.location.reload;window.addEventListener("load", function () {  document.forms[0].username.value="$(cat ~/opensourcepos_credentials/username)";document.forms[0].password.value="$(cat ~/opensourcepos_credentials/password)";document.forms[0].submit(); }, true );'|netcat localhost 32000
 test -d $outdir/invoices || mkdir -p $outdir/invoices;
 test -d $outdir/.invoices || mkdir -p $outdir/.invoices
 echo "$list"|while read a;do 
@@ -16,8 +26,7 @@ echo "$list"|while read a;do
 	finaltarget=$outdir"/invoices/"$invnum".pdf";
 	pretarget=$outdir"/.invoices/"$invnum".pdf";
 	test -e $finaltarget || (
-				cd ~;test -d .mozilla/ && rm -rf .mozilla && tar xzf mozilla.profile.tar.gz 
-				firefox --display $(vnc_display_first) -silent -tray \
+				firefox -P ospos-headless --display $(vnc_display_first) -silent -tray \
 				-print-shrinktofit yes \
 				-print-header-left no -print-header-center no -print-header-right no \
 				-print-footer-center no -print-footer-left no -print-footer-right no \
