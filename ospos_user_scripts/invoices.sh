@@ -13,7 +13,7 @@ ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/fire
 
 nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10;##find way to wait for port 32000 to open 
 hosturl="http://127.0.0.1/"
-osposurl=$hosturl"ospos"
+osposurl=$hosturl"ospos/"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
 echo 'window.location="'$osposurl'/public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
@@ -34,7 +34,7 @@ echo "$list"|while read a;do
 				-print-bgcolors yes \
 				-print-margin-top 0.2 -print-margin-left 0.2 -print-margin-right 0.2 -print-margin-bottom 0.2 \
 				-print-file $pretarget \
-				-print $osposurl/sales/invoice/$sale \
+				-print $osposurl"/public/sales/invoice/"$sale \
 				-print-mode pdf -print-header no -print-footer no 2>/dev/null;
 				pdftops $pretarget $pretarget".ps" && rm $pretarget && 	gs 	-dPDFA -dBATCH \
 												-dNOPAUSE -dNOOUTERSAVE -dUseCIEColor \
