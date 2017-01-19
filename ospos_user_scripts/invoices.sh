@@ -5,9 +5,11 @@
 vnc_display_first() { ps -AFc|grep Xtight|grep -v grep |grep ~/.Xauthority |sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
 
 grep "Path=ospos-headless.ospos-headless" ~/.mozilla/firefox/profiles.ini|| echo -en "\n[Profile"$(cat ~/.mozilla/firefox/profiles.ini |grep "\[Profile"|wc -l)"]\nName=ospos-headless\nIsRelative=1\nPath=ospos-headless.ospos-headless\n" >> ~/.mozilla/firefox/profiles.ini
+rm -rf /tmp/ospos-headless/profile/
 mkdir -p /tmp/ospos-headless/cache;mkdir -p /tmp/ospos-headless/profile;
 chown $(id -un) /tmp/ospos-headless/*;chgrp $(id -gn) /tmp/ospos-headless/*;
 cd /tmp/ospos-headless/profile ; tar xvzf ~/opensourcepos-GoBD/ospos_user_scripts/mozilla.profile.tar.gz
+
 ln -sf /tmp/ospos-headless/cache ~/.cache/mozilla/firefox/ospos-headless.ospos-headless
 ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/firefox/ospos-headless.ospos-headless
 
