@@ -1,5 +1,5 @@
 #!/bin/bash
-vnc_display_first() { ps -Fc|grep Xtight|grep -v grep |grep X11|sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
+vnc_display_first() { ps -AFc|grep Xtight|grep -v grep |grep ~/.Xauthority |sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
 firefox --display $(vnc_display_first );sleep 10;##find way to wait for port 32000 to open 
 osposurl="http://127.0.0.1/ospos/"
 outdir=~/pdfout
