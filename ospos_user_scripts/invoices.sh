@@ -35,7 +35,7 @@ echo "$list"|while read a;do
 				-print-margin-top 0.2 -print-margin-left 0.2 -print-margin-right 0.2 -print-margin-bottom 0.2 \
 				-print-file $pretarget \
 				-print $osposurl"/public/sales/invoice/"$sale \
-				-print-mode pdf -print-header no -print-footer no 2>/dev/null;
+				-print-mode pdf -print-header no -print-footer no 2>/dev/null;sleep 10
 				pdftops $pretarget $pretarget".ps" && rm $pretarget && 	gs 	-dPDFA -dBATCH \
 												-dNOPAUSE -dNOOUTERSAVE -dUseCIEColor \
 												-sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite \
@@ -48,4 +48,4 @@ echo "$list"|while read a;do
 				)
 	done
 	killall /usr/lib/firefox-esr/crashreporter /usr/lib/firefox/crashreporter
-echo 'window.location="'$osposurl'public/home/logout";'|netcat localhost 32000;
+echo 'window.location="'$osposurl'/public/home/logout";'|netcat localhost 32000;
