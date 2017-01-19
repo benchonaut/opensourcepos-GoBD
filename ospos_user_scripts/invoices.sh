@@ -16,7 +16,7 @@ hosturl="http://127.0.0.1/"
 osposurl=$hosturl"ospos/"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
-echo 'window.location="'$osposurl'public/login";widow.location.reload;window.addEventListener("load", function () {  document.forms[0].username.value="$(cat ~/opensourcepos_credentials/username)";document.forms[0].password.value="$(cat ~/opensourcepos_credentials/password)";document.forms[0].submit(); }, true );'|netcat localhost 32000
+echo 'window.location="'$osposurl'public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
 test -d $outdir/invoices || mkdir -p $outdir/invoices;
 test -d $outdir/.invoices || mkdir -p $outdir/.invoices
 echo "$list"|while read a;do 
@@ -48,3 +48,4 @@ echo "$list"|while read a;do
 				)
 	done
 	killall /usr/lib/firefox-esr/crashreporter /usr/lib/firefox/crashreporter
+echo 'window.location="'$osposurl'public/home/logout";'|netcat localhost 32000;
