@@ -13,10 +13,10 @@ ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/fire
 
 nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10;##find way to wait for port 32000 to open 
 hosturl="http://127.0.0.1/"
-osposurl=$hosturl"ospos/"
+osposurl=$hosturl"ospos"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
-echo 'window.location="'$osposurl'public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
+echo 'window.location="'$osposurl'/public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
 test -d $outdir/invoices || mkdir -p $outdir/invoices;
 test -d $outdir/.invoices || mkdir -p $outdir/.invoices
 echo "$list"|while read a;do 
