@@ -2,7 +2,7 @@
 #### You need an authenticated firefox profile first, then create an archive like:  tar cvzf mozilla.profile.tar.gz .mozilla/
 #### this script expects an already installed "cmdlnprint" extension in your pre-authed firefox profile
 #### this scripts expects your mozilla.profile.tar.gz in your home directory
-
+#### firefox will behave strange with no printer installed, so meybe install cups-pdf before
 
 /usr/bin/tightvncserver :1 -geometry 1920x1080 
 vnc_display_first() { ps -AFc|grep Xtight|grep -v grep |grep ~/.Xauthority |sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
@@ -21,7 +21,7 @@ lsof -i|grep localhost:32000|grep firefox || nohup firefox -P ospos-headless --d
 hosturl="http://127.0.0.1/"
 osposurl=$hosturl"ospos"
 outdir=~/pdfout
-list=$(wget -q -O- $hosturl"/ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
+list=$(wget -q -O- $hosturl"ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
 echo 'window.location="'$osposurl'/public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
 test -d $outdir/invoices || mkdir -p $outdir/invoices;
 test -d $outdir/.invoices || mkdir -p $outdir/.invoices
