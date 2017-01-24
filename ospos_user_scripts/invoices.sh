@@ -13,7 +13,8 @@ cd /tmp/ospos-headless/profile ; tar xvzf ~/opensourcepos-GoBD/ospos_user_script
 ln -sf /tmp/ospos-headless/cache ~/.cache/mozilla/firefox/ospos-headless.ospos-headless
 ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/firefox/ospos-headless.ospos-headless
 
-nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10;##find way to wait for port 32000 to open 
+lsof -i|grep localhost:32000|grep firefox || nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10; lsof -i|grep localhost:32000|grep firefox && echo port open10 || ( sleep 10 ;lsof -i|grep localhost:32000|grep firefox && echo port open20 ||echo not open)
+#nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10;##find way to wait for port 32000 to open 
 hosturl="http://127.0.0.1/"
 osposurl=$hosturl"ospos"
 outdir=~/pdfout
