@@ -2,6 +2,9 @@
 #### You need an authenticated firefox profile first, then create an archive like:  tar cvzf mozilla.profile.tar.gz .mozilla/
 #### this script expects an already installed "cmdlnprint" extension in your pre-authed firefox profile
 #### this scripts expects your mozilla.profile.tar.gz in your home directory
+
+
+/usr/bin/tightvncserver :1 -geometry 1920x1080 
 vnc_display_first() { ps -AFc|grep Xtight|grep -v grep |grep ~/.Xauthority |sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
 
 grep "Path=ospos-headless.ospos-headless" ~/.mozilla/firefox/profiles.ini|| echo -en "\n[Profile"$(cat ~/.mozilla/firefox/profiles.ini |grep "\[Profile"|wc -l)"]\nName=ospos-headless\nIsRelative=1\nPath=ospos-headless.ospos-headless\n" >> ~/.mozilla/firefox/profiles.ini
@@ -52,3 +55,4 @@ echo "$list"|while read a;do
 	done
 	killall /usr/lib/firefox-esr/crashreporter /usr/lib/firefox/crashreporter
 echo 'window.location="'$osposurl'/public/home/logout";'|netcat localhost 32000;
+/usr/bin/tightvncserver -kill :1
