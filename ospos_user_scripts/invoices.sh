@@ -1,8 +1,9 @@
 #!/bin/bash
-#### You need an authenticated firefox profile first, then create an archive like:  tar cvzf mozilla.profile.tar.gz .mozilla/
+#### You need an a prepared mozilla profile and your credentials in ~/.ospos_credentials/username and ~/.ospos_credentials/password, then create an archive like:  tar cvzf mozilla.profile.tar.gz .mozilla/
 #### this script expects an already installed "cmdlnprint" extension in your pre-authed firefox profile
 #### this scripts expects your mozilla.profile.tar.gz in your home directory
 #### firefox will behave strange with no printer installed, so meybe install cups-pdf before
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/local/games:/usr/games
 
 /usr/bin/tightvncserver :1 -geometry 1920x1080 
 vnc_display_first() { ps -AFc|grep Xtight|grep -v grep |grep ~/.Xauthority |sed 's/.\+Xtightvnc //g'|cut -d" " -f1|head -n1; } ;
@@ -15,7 +16,7 @@ cd /tmp/ospos-headless/profile ; tar xvzf ~/opensourcepos-GoBD/ospos_user_script
 
 ln -sf /tmp/ospos-headless/cache ~/.cache/mozilla/firefox/ospos-headless.ospos-headless
 ln -sf /tmp/ospos-headless/profile/ospos-headless.ospos-headless ~/.mozilla/firefox/ospos-headless.ospos-headless
-
+rm ~/.mozilla/firefox/ospos-headless.ospos-headless/.parentlock
 lsof -i|grep localhost:32000|grep firefox || nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10; lsof -i|grep localhost:32000|grep firefox && echo port open10 || ( sleep 10 ;lsof -i|grep localhost:32000|grep firefox && echo port open20 ||echo not open)
 #nohup firefox -P ospos-headless --display $(vnc_display_first ) & sleep 10;##find way to wait for port 32000 to open 
 hosturl="http://127.0.0.1/"
@@ -29,7 +30,7 @@ echo "$list"|while read a;do
 	sale=$(echo $a|cut -d":" -f1);invnum=$(echo $a|cut -d":" -f2);
 	echo -n $sale $invnum;
 	invnum=$(echo -n $invnum|cut -d"-" -f1|tr -d '\n';echo -n "-";printf %.5d $(echo $invnum|cut -d"-" -f2))
-	echo "→ "$invnum".pdf"
+	echo -n "→ "$invnum".pdf";echo -en "\r";
 	finaltarget=$outdir"/invoices/"$invnum".pdf";
 	pretarget=$outdir"/.invoices/"$invnum".pdf";
 	test -e $finaltarget || (
@@ -41,13 +42,8 @@ echo "$list"|while read a;do
 				-print-margin-top 0.2 -print-margin-left 0.2 -print-margin-right 0.2 -print-margin-bottom 0.2 \
 				-print-file $pretarget \
 				-print $osposurl"/public/sales/invoice/"$sale \
-				-print-mode pdf -print-header no -print-footer no 2>/dev/null;sleep 10
-				pdftops $pretarget $pretarget".ps" && rm $pretarget && 	gs 	-dPDFA -dBATCH \
-												-dNOPAUSE -dNOOUTERSAVE -dUseCIEColor \
-												-sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite \
-												-sPDFACompatibilityPolicy=1 \
-												-dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress \
-												-sOutputFile=$pretarget".pdf" $pretarget".ps"
+				-print-mode pdf -print-header no -print-footer no 2>/dev/null;sleep 20 ;( pdftops $pretarget /tmp/$invnum".ps" &&  gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -sOutputFile=/tmp/$invnum".pdf" /tmp/$invnum".ps" ; mv /tmp/$invnum".pdf" $finaltarget && rm /tmp/$invnum".ps" $pretarget ) &
+
 				##NEED ZUGFERD CONVERSION
 				mv $pretarget".pdf" $finaltarget 
 				rm $pretarget".ps"
