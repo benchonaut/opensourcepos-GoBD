@@ -23,7 +23,7 @@ hosturl="http://127.0.0.1/"
 osposurl=$hosturl"ospos"
 outdir=~/pdfout
 list=$(wget -q -O- $hosturl"ospos_addons/invoice-highest.php"|sed 's/ //g'|grep -v ^$);
-echo 'window.location="'$osposurl'/public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
+#echo 'window.location="'$osposurl'/public/login";'|netcat localhost 32000;sleep 5 ;echo 'document.forms[0].username.value="'$(cat ~/.ospos_credentials/username)'";document.forms[0].password.value="'$(cat ~/.ospos_credentials/password)'";document.forms[0].submit();'|netcat localhost 32000
 test -d $outdir/invoices || mkdir -p $outdir/invoices;
 test -d $outdir/.invoices || mkdir -p $outdir/.invoices
 echo "$list"|while read a;do 
@@ -34,14 +34,14 @@ echo "$list"|while read a;do
 	finaltarget=$outdir"/invoices/"$invnum".pdf";
 	pretarget=$outdir"/.invoices/"$invnum".pdf";
 	test -e $finaltarget || (
-				firefox -P ospos-headless --display $(vnc_display_first) -silent -tray \
+				firefox-esr -P ospos-headless --display $(vnc_display_first) -silent -tray \
+				-print $osposurl"/public/sales/invoice/"$sale \
 				-print-shrinktofit yes \
 				-print-header-left no -print-header-center no -print-header-right no \
 				-print-footer-center no -print-footer-left no -print-footer-right no \
 				-print-bgcolors yes \
-				-print-margin-top 0.2 -print-margin-left 0.2 -print-margin-right 0.2 -print-margin-bottom 0.2 \
 				-print-file $pretarget \
-				-print $osposurl"/public/sales/invoice/"$sale \
+				-print-margin-top 0.2 -print-margin-left 0.2 -print-margin-right 0.2 -print-margin-bottom 0.2 \
 				-print-mode pdf -print-header no -print-footer no 2>/dev/null;sleep 20 ;( pdftops $pretarget /tmp/$invnum".ps" &&  gs -dPDFA -dBATCH -dNOPAUSE -dNOOUTERSAVE -dUseCIEColor -sProcessColorModel=DeviceCMYK -sDEVICE=pdfwrite -sPDFACompatibilityPolicy=1 -dCompatibilityLevel=1.4 -dPDFSETTINGS=/prepress -sOutputFile=/tmp/$invnum".pdf" /tmp/$invnum".ps" ; mv /tmp/$invnum".pdf" $finaltarget && rm /tmp/$invnum".ps" $pretarget ) &
 
 				##NEED ZUGFERD CONVERSION
